@@ -140,9 +140,14 @@ def add_products(session):
             if product.vk_id:
                 print(product.name, "уже загружен")
             else:
-                add_product(session=session, product=product)
-                add_to_category(product=product, category=category)
-                print("Добавлен", product.name)
+                print("Добавляю", product.name)
+                try:
+                    add_product(session=session, product=product)
+                    add_to_category(product=product, category=category)
+                    print("Добавлен", product.name)
+                except Exception as e:
+                    print("Не добавлен", product.name, "по причине", e)
+                    # break
                 time.sleep(0.8)
 
 
@@ -169,13 +174,35 @@ def update_product(session, product: Product):
 
 def main():
     # photo_id = upload_photo()
-    engine = create_engine('sqlite:///hishnik.db', echo=True)
+    engine = create_engine('sqlite:///hishnik.db', echo=False)
     session = sessionmaker(bind=engine)()
-    while True:
-        try:
-            add_products(session=session)
-        except Exception as e:
-            print("Exception = ", e)
+    # add_products(session=session)
+
+
+    category_name="Аксессуары для рыбалки"
+    # products = session.query(Product).filter_by(category=category_name)
+    products = session.query(Product)
+    category = session.query(Category).filter_by(name=category_name).first()
+    for product in products:
+        if not product.vk_id:
+            print(product.name)
+            # try:
+            #     add_to_category(product=product, category=category)
+            #     print(product.name, "добавлен в категорию")
+            # except Exception as e:
+            #     print("Уже добавлен в категорию")
+
+
+    # name="Костюм Remington TRAIL CAMO Eurowinter Green forest, р."
+    # product = session.query(Product).filter_by(name=name).first()
+    # print(product.vk_id)
+    # add_product(session=session, product=product)
+    # add_to_category(product=product, category=product.category)
+    # while True:
+    #     try:
+    #         add_products(session=session)
+    #     except Exception as e:
+    #         print("Exception = ", e)
     # product = session.query(Product).filter_by(name='Тетерка').first()
     # update_product(session=session, product=product)
     # add_product(session, product)
